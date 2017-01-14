@@ -1,0 +1,92 @@
+<!DOCTYPE html5>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	
+	<title>QB Synth</title>
+	<style>
+Body
+{
+	background-color: #787878;
+	color: #ffffff;
+	margin: 0px;
+}
+    </style>
+</head>
+<body>
+<div class="pageSection">
+    <div class="subSection">
+    <h1>QB Synth</h1>
+    </div>
+    <div class = "pageSection">
+        <div class= "pageSectionWindow">
+            <canvas id="myCanvas" />
+        </div>
+    </div>
+</body>
+<script src="sfxkit.js"></script>
+<script>
+
+var soundDuration = 0.5;
+var bitrate = 8000;
+
+var freq = new sfxkit.ComponentNumber().SetValue(100);
+
+var mainOsc = new sfxkit.ComponentSine().SetFrequency(freq);
+
+var player = new sfxkit.PlayerBasic();
+var data = player.BuildData(bitrate, soundDuration, mainOsc);
+
+CanvasDraw("myCanvas",1024,64,data);
+
+function CanvasDraw(canvasId, scrWidth, scrHeight,data)
+{
+  var minValue = data[0];
+  var maxValue = data[0];
+  for ( var x = 0; x <= data.length;x = x + 1)
+  {
+    var value = data[x];
+
+    if ( value < minValue)
+      minValue = value;
+      
+    if ( value > maxValue)
+      maxValue = value;
+  }
+
+  var canvas = document.getElementById(canvasId);
+  canvas.width = scrWidth;
+  canvas.height = scrHeight;
+  
+  var ctx = canvas.getContext("2d");
+
+  ctx.fillStyle="white";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle="green";
+  ctx.strokeStyle = '#2f2f2f';
+
+  var yRange = maxValue - minValue;
+  var xp = 0;
+  var yp = 0;
+  var valueSize = data.length;
+
+  xp = 0;
+  yp = canvas.height - canvas.height / yRange * (data[0]-minValue);
+
+  for ( var point = 1; point < valueSize; point++)
+  {
+    var value = data[point];
+    ctx.beginPath();
+    ctx.moveTo(xp,yp);
+    xp = canvas.width * point / valueSize;
+    yp = canvas.height - canvas.height / yRange * (value-minValue);
+    ctx.lineTo(xp,yp);
+    ctx.fillRect(xp,yp,2,2);
+    ctx.stroke();
+  }
+
+}
+
+</script>
+</html>

@@ -1,0 +1,12 @@
+{
+    "compileOnSave":true,
+   "compilerOptions": {
+        "target": "ES6",
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "outDir": "./sfxkit",
+        "outFile": "../sfxkit.js",
+        "rootDir": "./",
+        "sourceMap": false
+    }
+}
