@@ -7,10 +7,34 @@
 	<style>
 Body
 {
-	background-color: #787878;
-	color: #ffffff;
-	margin: 0px;
+  background-color: #787878;
+  color: #ffffff;
+  margin: 0px;
 }
+
+.pageSection
+{
+  float:left;
+  clear:both;
+  width:100%;
+  margin-bottom: 10px;
+  background-color:#f0f0f0;
+  text-align:center;
+}
+
+.pageSection h1
+{
+  color: #000000;
+  display:inline-block;
+  width:100%;
+}
+
+.pageSectionWindow
+{
+  overflow-x: auto;
+  margin:10px;
+}
+
     </style>
 </head>
 <body>
@@ -23,21 +47,30 @@ Body
             <canvas id="myCanvas" />
         </div>
     </div>
-</body>
+    <div class="PageSection">
+      <input type="button" value="Play" onClick="audio.play();" />
+    </div>
+ </body>
 <script src="sfxkit.js"></script>
 <script>
 
-var soundDuration = 0.5;
+var soundDuration = 1;
 var bitrate = 8000;
 
-var freq = new sfxkit.ComponentNumber().SetValue(100);
+var freq = new sfxkit.ComponentNumber().SetValue(200);
 
 var mainOsc = new sfxkit.ComponentSine().SetFrequency(freq);
 
 var player = new sfxkit.PlayerBasic();
 var data = player.BuildData(bitrate, soundDuration, mainOsc);
 
-CanvasDraw("myCanvas",1024,64,data);
+CanvasDraw("myCanvas",data.length,64,data);
+
+var sound = new sfxkit.Sound();
+
+var audio = sound.CreateObject(data, bitrate);
+
+audio.loop = false;
 
 function CanvasDraw(canvasId, scrWidth, scrHeight,data)
 {
