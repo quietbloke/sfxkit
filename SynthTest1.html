@@ -20,11 +20,11 @@ Body
   margin-bottom: 10px;
   background-color:#f0f0f0;
   text-align:center;
+  color: #000000;
 }
 
 .pageSection h1
 {
-  color: #000000;
   display:inline-block;
   width:100%;
 }
@@ -33,6 +33,35 @@ Body
 {
   overflow-x: auto;
   margin:10px;
+}
+
+.subsection ul
+{
+  text-align:center;
+  list-style-type:none;
+  padding-left:0px;
+  margin-left:0px;
+}
+
+.subsection ul li
+{
+  padding-left:0px;
+  margin-left:0px;
+  margin-bottom:10px;
+}
+
+.subsection ul li span
+{
+  color:#000000;
+  display:inline-block;
+  width:100px;
+  padding-right:10px;
+  text-align:right;
+}
+
+.subsection ul li input
+{
+  margin-left:20px;
 }
 
     </style>
@@ -47,30 +76,51 @@ Body
             <canvas id="myCanvas" />
         </div>
     </div>
+
+
+
     <div class="PageSection">
-      <input type="button" value="Play" onClick="audio.play();" />
+      <div class="subSection">
+        <h2>Oscillator</h2>
+        <ul>
+          <li><span>Frequency</span><input id="baseFreq" type="number" value="800" /></li>
+        </ul>
+      </div>
+      <div class="subSection">
+        <input type="button" value="Create" onClick="create();" />
+        <input type="button" value="Play" onClick="audio.play();" />
+      </div>
     </div>
  </body>
 <script src="sfxkit.js"></script>
 <script>
 
+var audio;
 var soundDuration = 1;
 var bitrate = 8000;
 
-var freq = new sfxkit.ComponentNumber().SetValue(200);
-
+var freq = new sfxkit.ComponentNumber();
 var mainOsc = new sfxkit.ComponentSine().SetFrequency(freq);
 
-var player = new sfxkit.PlayerBasic();
-var data = player.BuildData(bitrate, soundDuration, mainOsc);
+create = function()
+{
+  // get screen settings
+  var inpFreq = Number(document.getElementById("baseFreq").value);
 
-CanvasDraw("myCanvas",data.length,64,data);
+  // Adjust synth settings
+  freq.SetValue(inpFreq);
 
-var sound = new sfxkit.Sound();
+  // build the sound
+  var player = new sfxkit.PlayerBasic();
+  var data = player.BuildData(bitrate, soundDuration, mainOsc);
 
-var audio = sound.CreateObject(data, bitrate);
+  CanvasDraw("myCanvas",data.length,64,data);
 
-audio.loop = false;
+  // create an html audio object from the raw data
+  var sound = new sfxkit.Sound();
+  audio = sound.CreateObject(data, bitrate);
+  audio.loop = false;
+}
 
 function CanvasDraw(canvasId, scrWidth, scrHeight,data)
 {
@@ -121,5 +171,6 @@ function CanvasDraw(canvasId, scrWidth, scrHeight,data)
 
 }
 
+create();
 </script>
 </html>

@@ -1,5 +1,47 @@
 var sfxkit;
 (function (sfxkit) {
+    class ComponentAdd {
+        GetNextValue(timeSpan) {
+            return this.inputA.GetNextValue(timeSpan) + this.inputB.GetNextValue(timeSpan);
+        }
+        Reset() {
+            this.inputA.Reset();
+            this.inputB.Reset();
+        }
+        SetValueA(value) {
+            this.inputA = value;
+            return this;
+        }
+        SetValueB(value) {
+            this.inputB = value;
+            return this;
+        }
+    }
+    sfxkit.ComponentAdd = ComponentAdd;
+})(sfxkit || (sfxkit = {}));
+var sfxkit;
+(function (sfxkit) {
+    class ComponentMultiply {
+        GetNextValue(timeSpan) {
+            return this.inputA.GetNextValue(timeSpan) * this.inputB.GetNextValue(timeSpan);
+        }
+        Reset() {
+            this.inputA.Reset();
+            this.inputB.Reset();
+        }
+        SetValueA(value) {
+            this.inputA = value;
+            return this;
+        }
+        SetValueB(value) {
+            this.inputB = value;
+            return this;
+        }
+    }
+    sfxkit.ComponentMultiply = ComponentMultiply;
+})(sfxkit || (sfxkit = {}));
+var sfxkit;
+(function (sfxkit) {
     class ComponentNumber {
         GetNextValue(timespan) {
             return this.value;
@@ -52,6 +94,7 @@ var sfxkit;
             var values = new Array();
             var valueSize = 1;
             var inc = 1 / bitrate;
+            osc.Reset();
             values[0] = osc.GetNextValue(0);
             for (var x = inc; x <= duration; x = x + inc) {
                 var value = osc.GetNextValue(inc);

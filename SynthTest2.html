@@ -1,0 +1,200 @@
+<!DOCTYPE html5>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	
+	<title>QB Synth</title>
+	<style>
+Body
+{
+  background-color: #787878;
+  color: #ffffff;
+  margin: 0px;
+}
+
+.pageSection
+{
+  float:left;
+  clear:both;
+  width:100%;
+  margin-bottom: 10px;
+  background-color:#f0f0f0;
+  text-align:center;
+  color: #000000;
+}
+
+.pageSection h1
+{
+  display:inline-block;
+  width:100%;
+}
+
+.pageSectionWindow
+{
+  overflow-x: auto;
+  margin:10px;
+}
+
+.subsection ul
+{
+  text-align:center;
+  list-style-type:none;
+  padding-left:0px;
+  margin-left:0px;
+}
+
+.subsection ul li
+{
+  padding-left:0px;
+  margin-left:0px;
+  margin-bottom:10px;
+}
+
+.subsection ul li span
+{
+  color:#000000;
+  display:inline-block;
+  width:100px;
+  padding-right:10px;
+  text-align:right;
+}
+
+.subsection ul li input
+{
+  margin-left:20px;
+}
+
+    </style>
+</head>
+<body>
+<div class="pageSection">
+    <div class="subSection">
+    <h1>QB Synth</h1>
+    </div>
+    <div class = "pageSection">
+        <div class= "pageSectionWindow">
+            <canvas id="myCanvas" />
+        </div>
+    </div>
+
+
+
+    <div class="PageSection">
+      <div class="subSection">
+        <h2>Oscillator</h2>
+        <ul>
+          <li><span>Frequency</span><input id="baseFreq" type="number" value="800" /></li>
+        </ul>
+      </div>
+      <div class="subSection">
+        <h2>Frequency Modulater</h2>
+        <ul>
+          <li><span>Frequency</span><input id="modFreq" type="number" value="1" /></li>
+          <li><span>Start Angle (Degrees)</span><input id="modStartAngle" type="number" value="0" /></li>
+          <li><span>Displacement</span><input id="modDisplacement" type="number" value="50" /></li>
+        </ul>
+      </div>
+      <div class="subSection">
+        <input type="button" value="Create" onClick="create();" />
+        <input type="button" value="Play" onClick="audio.play();" />
+      </div>
+    </div>
+ </body>
+<script src="sfxkit.js"></script>
+<script>
+
+var audio;
+var soundDuration = 1;
+var bitrate = 8000;
+
+var mainFreq = new sfxkit.ComponentNumber();
+var mainOsc = new sfxkit.ComponentSine();
+
+var modFreq = new sfxkit.ComponentNumber();
+var modOsc = new sfxkit.ComponentSine().SetFrequency(modFreq);
+var modDisplacement = new sfxkit.ComponentNumber();
+
+// mutiply mod frequency by Displacement
+// and add it to the base frequency
+modOutFreq = new sfxkit.ComponentAdd()
+  .SetValueA(mainFreq)
+  .SetValueB(new sfxkit.ComponentMultiply()
+    .SetValueA(modOsc)
+    .SetValueB(modDisplacement))
+
+// make the output the frequency input 
+mainOsc.SetFrequency(modOutFreq);
+
+create = function()
+{
+  // Adjust synth settings from values on the screen
+  mainFreq.SetValue(Number(document.getElementById("baseFreq").value));
+
+  modFreq.SetValue(Number(document.getElementById("modFreq").value));
+  modOsc.InitialAngle(Number(document.getElementById("modStartAngle").value/180*Math.PI));
+  modDisplacement.SetValue(Number(document.getElementById("modDisplacement").value));
+
+  // build the sound
+  var player = new sfxkit.PlayerBasic();
+  var data = player.BuildData(bitrate, soundDuration, mainOsc);
+
+  CanvasDraw("myCanvas",data.length,64,data);
+
+  // create an html audio object from the raw data
+  var sound = new sfxkit.Sound();
+  audio = sound.CreateObject(data, bitrate);
+//  audio.loop = true;
+}
+
+function CanvasDraw(canvasId, scrWidth, scrHeight,data)
+{
+  var minValue = data[0];
+  var maxValue = data[0];
+  for ( var x = 0; x <= data.length;x = x + 1)
+  {
+    var value = data[x];
+
+    if ( value < minValue)
+      minValue = value;
+      
+    if ( value > maxValue)
+      maxValue = value;
+  }
+
+  var canvas = document.getElementById(canvasId);
+  canvas.width = scrWidth;
+  canvas.height = scrHeight;
+  
+  var ctx = canvas.getContext("2d");
+
+  ctx.fillStyle="white";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle="green";
+  ctx.strokeStyle = '#2f2f2f';
+
+  var yRange = maxValue - minValue;
+  var xp = 0;
+  var yp = 0;
+  var valueSize = data.length;
+
+  xp = 0;
+  yp = canvas.height - canvas.height / yRange * (data[0]-minValue);
+
+  for ( var point = 1; point < valueSize; point++)
+  {
+    var value = data[point];
+    ctx.beginPath();
+    ctx.moveTo(xp,yp);
+    xp = canvas.width * point / valueSize;
+    yp = canvas.height - canvas.height / yRange * (value-minValue);
+    ctx.lineTo(xp,yp);
+    ctx.fillRect(xp,yp,2,2);
+    ctx.stroke();
+  }
+
+}
+
+create();
+</script>
+</html>

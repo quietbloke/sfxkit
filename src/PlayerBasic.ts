@@ -8,6 +8,7 @@ namespace sfxkit
             var valueSize:number = 1;
             var inc:number = 1/bitrate;
 
+            osc.Reset();
             values[0] = osc.GetNextValue(0);
             for ( var x = inc; x <= duration;x = x + inc)
             {
