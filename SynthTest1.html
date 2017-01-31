@@ -5,65 +5,64 @@
 	
 	<title>QB Synth</title>
 	<style>
-Body
-{
-  background-color: #787878;
-  color: #ffffff;
-  margin: 0px;
-}
+    Body
+    {
+      background-color: #787878;
+      color: #ffffff;
+      margin: 0px;
+    }
 
-.pageSection
-{
-  float:left;
-  clear:both;
-  width:100%;
-  margin-bottom: 10px;
-  background-color:#f0f0f0;
-  text-align:center;
-  color: #000000;
-}
+    .pageSection
+    {
+      float:left;
+      clear:both;
+      width:100%;
+      margin-bottom: 10px;
+      background-color:#f0f0f0;
+      text-align:center;
+      color: #000000;
+    }
 
-.pageSection h1
-{
-  display:inline-block;
-  width:100%;
-}
+    .pageSection h1
+    {
+      display:inline-block;
+      width:100%;
+    }
 
-.pageSectionWindow
-{
-  overflow-x: auto;
-  margin:10px;
-}
+    .pageSectionWindow
+    {
+      overflow-x: auto;
+      margin:10px;
+    }
 
-.subsection ul
-{
-  text-align:center;
-  list-style-type:none;
-  padding-left:0px;
-  margin-left:0px;
-}
+    .subsection ul
+    {
+      text-align:center;
+      list-style-type:none;
+      padding-left:0px;
+      margin-left:0px;
+    }
 
-.subsection ul li
-{
-  padding-left:0px;
-  margin-left:0px;
-  margin-bottom:10px;
-}
+    .subsection ul li
+    {
+      padding-left:0px;
+      margin-left:0px;
+      margin-bottom:10px;
+    }
 
-.subsection ul li span
-{
-  color:#000000;
-  display:inline-block;
-  width:100px;
-  padding-right:10px;
-  text-align:right;
-}
+    .subsection ul li span
+    {
+      color:#000000;
+      display:inline-block;
+      width:100px;
+      padding-right:10px;
+      text-align:right;
+    }
 
-.subsection ul li input
-{
-  margin-left:20px;
-}
-
+    .subsection ul li input
+    {
+      margin-left:20px;
+    }
     </style>
 </head>
 <body>
@@ -76,13 +75,18 @@ Body
             <canvas id="myCanvas" />
         </div>
     </div>
-
-
-
     <div class="PageSection">
       <div class="subSection">
         <h2>Oscillator</h2>
         <ul>
+          <li>
+            <span>Type</span>
+            <select id="baseOscillator">
+              <option value "Sine">Sine</option>
+              <option value "Square">Square</option>
+              <option value "Random">Random</option>
+            </select>
+          </li>
           <li><span>Frequency</span><input id="baseFreq" type="number" value="800" /></li>
         </ul>
       </div>
@@ -100,12 +104,28 @@ var soundDuration = 1;
 var bitrate = 8000;
 
 var freq = new sfxkit.ComponentNumber();
-var mainOsc = new sfxkit.ComponentSine().SetFrequency(freq);
+var mainOsc = new sfxkit.ComponentOscillator()
+  .SetFrequency(freq);
 
 create = function()
 {
   // get screen settings
   var inpFreq = Number(document.getElementById("baseFreq").value);
+  var baseOscillatorObj = document.getElementById("baseOscillator");
+  switch(baseOscillatorObj.options[baseOscillatorObj.selectedIndex].text)
+  {
+    case "Sine":
+      mainOsc.SetOscillator(new sfxkit.OscillatorSine());
+      break;
+    case "Square":
+      mainOsc.SetOscillator(new sfxkit.OscillatorSquare());
+      break;
+    case "Random":
+      mainOsc.SetOscillator(new sfxkit.OscillatorRandom());
+      break;
+    default:
+      mainOsc.SetOscillator(new sfxkit.OscillatorSine());
+  }
 
   // Adjust synth settings
   freq.SetValue(inpFreq);

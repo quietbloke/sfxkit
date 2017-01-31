@@ -58,18 +58,22 @@ var sfxkit;
 })(sfxkit || (sfxkit = {}));
 var sfxkit;
 (function (sfxkit) {
-    class ComponentSine {
+    class ComponentOscillator {
         constructor(freq) {
             this.angle = 0;
             this.initialAngle = 0;
             this.frequency = freq;
+            this.oscillator = new sfxkit.OscillatorSine();
         }
         GetNextValue(timeSpan) {
             var angleInc = timeSpan * this.frequency.GetNextValue(timeSpan) * (Math.PI * 2);
+            var newCycle = false;
             this.angle += angleInc;
-            if (this.angle >= Math.PI * 2)
+            if (this.angle >= Math.PI * 2) {
                 this.angle -= Math.PI * 2;
-            return Math.sin(this.angle);
+                newCycle = true;
+            }
+            return this.oscillator.GetValueAt(this.angle, newCycle);
         }
         ;
         Reset() {
@@ -80,12 +84,51 @@ var sfxkit;
             this.frequency = value;
             return this;
         }
-        InitialAngle(initailAngle) {
+        SetInitialAngle(initailAngle) {
             this.initialAngle = initailAngle;
             return this;
         }
+        SetOscillator(oscillator) {
+            this.oscillator = oscillator;
+            return this;
+        }
     }
-    sfxkit.ComponentSine = ComponentSine;
+    sfxkit.ComponentOscillator = ComponentOscillator;
+})(sfxkit || (sfxkit = {}));
+var sfxkit;
+(function (sfxkit) {
+    class OscillatorRandom {
+        constructor() {
+            this.currentValue = Math.random() * 2 - 1;
+        }
+        GetValueAt(angle, newCycle) {
+            if (newCycle)
+                this.currentValue = Math.random() * 2 - 1;
+            return this.currentValue;
+        }
+    }
+    sfxkit.OscillatorRandom = OscillatorRandom;
+})(sfxkit || (sfxkit = {}));
+var sfxkit;
+(function (sfxkit) {
+    class OscillatorSine {
+        GetValueAt(angle, newCycle) {
+            return Math.sin(angle);
+        }
+    }
+    sfxkit.OscillatorSine = OscillatorSine;
+})(sfxkit || (sfxkit = {}));
+var sfxkit;
+(function (sfxkit) {
+    class OscillatorSquare {
+        GetValueAt(angle, newCycle) {
+            if (angle < Math.PI)
+                return 1;
+            else
+                return -1;
+        }
+    }
+    sfxkit.OscillatorSquare = OscillatorSquare;
 })(sfxkit || (sfxkit = {}));
 var sfxkit;
 (function (sfxkit) {
